@@ -46,6 +46,13 @@ public class JWTUtils {
      * @param subject jwt所面向的用户。payload中记录的public claims。当前环境中就是用户的登录名。
      * @param ttlMillis 有效期,单位毫秒
      * @return token， token是一次性的。是为一个用户的有效登录周期准备的一个token。用户退出或超时，token失效。
+     *iss: jwt签发者 
+     * sub: jwt所面向的用户 
+     * aud: 接收jwt的一方 
+     * exp: jwt的过期时间，这个过期时间必须要大于签发时间 
+     * nbf: 定义在什么时间之前，该jwt都是不可用的. 
+     * iat: jwt的签发时间 
+     * jti: jwt的唯一身份标识，主要用来作为一次性token,从而回避重放攻击。
      * @throws Exception
      */
     public static String createJWT(String id,String iss, String subject, long ttlMillis) {
@@ -62,7 +69,9 @@ public class JWTUtils {
                 .setIssuer(iss)
                 .setSubject(subject)
                 .setIssuedAt(now) // token生成的时间。
-                .signWith(signatureAlgorithm, secretKey); // 设定密匙和算法
+                .signWith(signatureAlgorithm, secretKey)
+                //自定义部分，一般而言添加角色
+                .claim("roll", "admin"); // 设定密匙和算法
         if (ttlMillis >= 0) {
             long expMillis = nowMillis + ttlMillis;
             Date expDate = new Date(expMillis); // token的失效时间。
